@@ -2,7 +2,6 @@
 #include "ext_obex.h"		// required for "new" style objects
 #include "z_dsp.h"			// required for MSP objects
 #include<simd/simd.h>
-#include<Accelerate/Accelerate.h>
 
 typedef struct {
 	t_pxobject const super;
@@ -16,7 +15,7 @@ typedef struct {
 
 C74_HIDDEN t_class const * class = NULL;
 
-C74_HIDDEN t_duffing const*const duffing_new(double const value) {
+C74_HIDDEN t_duffing const*const duffing_new(void) {
     register t_duffing*this = NULL;
     if ((this = (t_duffing*const)object_alloc((t_class*const)class))) {
         z_dsp_setup((t_pxobject*const)this, 7);
@@ -135,9 +134,9 @@ C74_HIDDEN void duffing_value(t_duffing const*const this, double const value) {
 }
 
 C74_EXPORT void ext_main(void*const r) {
-    if ((class = (t_class*const)class_new("duffing~", (method const)duffing_new, (method const)z_dsp_free, (long const)sizeof(t_duffing), 0L, A_DEFFLOAT, 0))) {
-        class_addmethod((t_class*const)class, (method const)duffing_dsp64, "dsp64", A_CANT, 0);
+    if ((class = (t_class*const)class_new("duffing~", (method const)duffing_new, (method const)z_dsp_free, (long const)sizeof(t_duffing), 0L, 0))) {
         class_addmethod((t_class*const)class, (method const)duffing_coefs, "list", A_GIMME, 0);
+        class_addmethod((t_class*const)class, (method const)duffing_dsp64, "dsp64", A_CANT, 0);
         class_addmethod((t_class*const)class, (method const)duffing_value, "float", A_FLOAT, 0);
         class_dspinit((t_class*const)class);
         class_register(CLASS_BOX, (t_class*const)class);
